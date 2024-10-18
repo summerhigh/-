@@ -1,9 +1,0 @@
-2024-10-18 00:03:36.085881 - info.json 생성 완료: C:\Users\kisia\Desktop\주요정보통신기반시설진단\3. 진단결과\Windows\20241018_check1\info.json
-2024-10-18 00:03:36.470177 - 진단 성공: C:\Users\kisia\Desktop\주요정보통신기반시설진단\1. 진단항목\Windows\1.py
-2024-10-18 00:03:36.832524 - 진단 성공: C:\Users\kisia\Desktop\주요정보통신기반시설진단\1. 진단항목\Windows\2.py
-2024-10-18 00:03:37.192490 - 진단 성공: C:\Users\kisia\Desktop\주요정보통신기반시설진단\1. 진단항목\Windows\3.py
-2024-10-18 00:03:37.299337 - 진단 성공: C:\Users\kisia\Desktop\주요정보통신기반시설진단\1. 진단항목\Windows\4.py
-2024-10-18 00:03:37.735170 - 진단 성공: C:\Users\kisia\Desktop\주요정보통신기반시설진단\1. 진단항목\Windows\5.py
-2024-10-18 00:03:38.955025 - 통합 JSON 파일 생성 완료: C:\Users\kisia\Desktop\주요정보통신기반시설진단\3. 진단결과\Windows\20241018_check1\20241018_진단결과통합.json
-2024-10-18 00:03:38.955527 - 진단 완료. 
-결과는 C:\Users\kisia\Desktop\주요정보통신기반시설진단\3. 진단결과\Windows\20241018_check1에 저장되었습니다.
