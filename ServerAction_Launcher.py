@@ -6,7 +6,7 @@ import socket
 import platform
 from datetime import datetime
 
-# 디렉토리 경로 정의
+# 디렉토리 경로 초기화
 base_dir = None
 action_base_dir = None
 result_base_dir = None

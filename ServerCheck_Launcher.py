@@ -4,14 +4,14 @@ import json
 import socket
 import platform
 import sys 
-import platform
 from datetime import datetime
 from make_json import make_json
 
-# 운영체제에 맞는 base_dir을 설정하기 위한 변수 초기화
+# 운영체제에 따라 설정하기 위한 변수 초기화
 base_dir = None
 result_base_dir = None
 log_dir = None
+python_cmd = "python"
 
 # 로그 파일명 생성
 def create_log_file_path(result_dir):
@@ -36,7 +36,8 @@ def log_message(log_file_path, message):
 # 진단 파일 실행
 def run_diagnosis_script(script_path, json_output_path, 담당자, log_file_path):
     try:
-        result = subprocess.run(['python', script_path, 담당자], capture_output=True, text=True, check=True)
+        # 진단 파일을 실행하는 명령어 (python or python3)
+        result = subprocess.run([python_cmd, script_path, 담당자], capture_output=True, text=True, check=True)
         diagnosis_result = json.loads(result.stdout)
 
         with open(json_output_path, 'w', encoding='utf-8') as json_file:
@@ -156,7 +157,7 @@ def generate_info_json(result_dir, log_file_path):
 # 메인 메소드
 def main():
     # 전역 변수 설정
-    global base_dir, result_base_dir, log_dir
+    global base_dir, result_base_dir, log_dir, python_cmd
 
     # 현재 운영체제 확인
     current_os = platform.system()
@@ -168,9 +169,11 @@ def main():
     if current_os == "Windows":
         base_dir = os.path.join(current_dir, "1. 진단항목", "Windows")
         result_base_dir = os.path.join(current_dir, "3. 진단결과", "Windows")
+        python_cmd = "python"  # Windows에서는 python 사용
     elif current_os == "Linux":
         base_dir = os.path.join(current_dir, "1. 진단항목", "Linux")
         result_base_dir = os.path.join(current_dir, "3. 진단결과", "Linux")
+        python_cmd = "python3"  # Linux에서는 python3 사용
     else:
         sys.exit(f"지원되지 않는 운영체제입니다: {current_os}. \n프로그램을 종료합니다.")
 

@@ -2,15 +2,21 @@ import os
 import sys
 import json
 from datetime import datetime
+import subprocess
 
 # 두 계층 상위 경로를 sys.path에 추가
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-# root 계정의 PATH 환경변수에서 "."의 위치 확인 함수
+# root 계정의 PATH 환경변수에서 "."의 위치 확인 함수 (서버별로 다르게 진단)
 def check_root_path_variable():
     try:
-        # 현재 root 계정의 PATH 환경변수 가져오기
+        # 첫 번째 시도: os.environ에서 root 계정의 PATH 환경변수 가져오기
         root_path = os.environ.get('PATH')
+
+        if not root_path:
+            # 두 번째 시도: 유닉스 시스템에서 `echo $PATH` 명령어로 PATH 환경변수 확인
+            result = subprocess.run(['echo', '$PATH'], capture_output=True, text=True)
+            root_path = result.stdout.strip()
 
         if not root_path:
             return "점검불가"  # PATH 환경변수가 없는 경우

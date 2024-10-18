@@ -7,16 +7,28 @@ from datetime import datetime
 # 두 계층 상위 경로를 sys.path에 추가
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+# 프로세스 확인 명령어 실행 함수 (ps aux 또는 ps -ef)
+def run_ps_command(service_name):
+    try:
+        # 첫 번째 시도: ps aux 명령어
+        result = subprocess.run(['ps', 'aux'], capture_output=True, text=True)
+    except subprocess.CalledProcessError:
+        # ps aux가 실패할 경우 ps -ef로 시도
+        result = subprocess.run(['ps', '-ef'], capture_output=True, text=True)
+    
+    # 서비스 필터링
+    filtered_processes = subprocess.run(['grep', service_name], input=result.stdout, text=True, capture_output=True)
+    filtered_processes = subprocess.run(['grep', '-v', 'grep'], input=filtered_processes.stdout, text=True, capture_output=True)
+    
+    return filtered_processes.stdout.strip()
+
 # SSH 서비스가 실행 중인지 확인하는 함수
 def check_ssh_service():
     try:
-        # ps aux | grep ssh | grep -v grep 명령어로 ssh 프로세스가 실행 중인지 확인
-        result = subprocess.run(['ps', 'aux'], capture_output=True, text=True)
-        filtered_processes = subprocess.run(['grep', 'ssh'], input=result.stdout, text=True, capture_output=True)
-        filtered_processes = subprocess.run(['grep', '-v', 'grep'], input=filtered_processes.stdout, text=True, capture_output=True)
+        # SSH 프로세스가 실행 중인지 확인
+        ssh_process = run_ps_command('ssh')
         
-        # SSH가 실행 중인 경우
-        if filtered_processes.stdout.strip():
+        if ssh_process:
             return True
         else:
             return False
@@ -26,13 +38,10 @@ def check_ssh_service():
 # Telnet 서비스가 실행 중인지 확인하는 함수
 def check_telnet_service():
     try:
-        # ps aux | grep telnet | grep -v grep 명령어로 telnet 프로세스가 실행 중인지 확인
-        result = subprocess.run(['ps', 'aux'], capture_output=True, text=True)
-        filtered_processes = subprocess.run(['grep', 'telnet'], input=result.stdout, text=True, capture_output=True)
-        filtered_processes = subprocess.run(['grep', '-v', 'grep'], input=filtered_processes.stdout, text=True, capture_output=True)
+        # Telnet 프로세스가 실행 중인지 확인
+        telnet_process = run_ps_command('telnet')
         
-        # Telnet이 실행 중인 경우
-        if filtered_processes.stdout.strip():
+        if telnet_process:
             return True
         else:
             return False

@@ -7,17 +7,32 @@ from datetime import datetime
 # 두 계층 상위 경로를 sys.path에 추가
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-# 패스워드 복잡성 설정 여부 확인 함수
+# 패스워드 복잡성 설정 여부 확인 함수 (서버에 따라 다르게 진단)
 def check_password_complexity():
     try:
-        # /etc/security/pwquality.conf 파일에서 패스워드 복잡성 관련 설정 확인
-        result = subprocess.run(['grep', 'minlen', '/etc/security/pwquality.conf'], capture_output=True, text=True, check=True)
+        # 첫 번째 시도: /etc/security/pwquality.conf 파일에서 패스워드 복잡성 확인 (리눅스 기반)
+        result = subprocess.run(['grep', 'minlen', '/etc/security/pwquality.conf'], capture_output=True, text=True)
         minlen = int(result.stdout.split('=')[-1].strip()) if result.stdout else 0
         
-        # /etc/login.defs 파일에서 PASS_MIN_LEN 설정 확인 (대체 경로에서 확인하는 경우)
+        # 두 번째 시도: /etc/login.defs 파일에서 PASS_MIN_LEN 설정 확인 (리눅스 대체 경로)
         if minlen == 0:
-            result = subprocess.run(['grep', 'PASS_MIN_LEN', '/etc/login.defs'], capture_output=True, text=True, check=True)
+            result = subprocess.run(['grep', 'PASS_MIN_LEN', '/etc/login.defs'], capture_output=True, text=True)
             minlen = int(result.stdout.split()[-1]) if result.stdout else 0
+
+        # 세 번째 시도: /etc/security/user 파일에서 설정 확인 (AIX 기반)
+        if minlen == 0:
+            result = subprocess.run(['grep', 'minlen', '/etc/security/user'], capture_output=True, text=True)
+            minlen = int(result.stdout.split('=')[-1].strip()) if result.stdout else 0
+        
+        # 네 번째 시도: /tcb/files/auth/system/default에서 MIN_PASSWORD_LENGTH 확인 (HP-UX 기반)
+        if minlen == 0:
+            result = subprocess.run(['grep', 'MIN_PASSWORD_LENGTH', '/tcb/files/auth/system/default'], capture_output=True, text=True)
+            minlen = int(result.stdout.split('=')[-1].strip()) if result.stdout else 0
+
+        # 다섯 번째 시도: 솔라리스는 /etc/default/passwd 파일에서 설정 확인
+        if minlen == 0:
+            result = subprocess.run(['grep', 'PASSLENGTH', '/etc/default/passwd'], capture_output=True, text=True)
+            minlen = int(result.stdout.split('=')[-1].strip()) if result.stdout else 0
 
         # 패스워드 복잡성 관련 설정 확인
         if minlen >= 8:
