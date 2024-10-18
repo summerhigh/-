@@ -50,19 +50,19 @@ def main():
     # 재진단 수행
     diagnosis_result = check_autoshare()
 
-    # 조치 결과와 재진단 결과를 결합하여 최종 출력 (런처에 맞는 형식)
+    # 조치 결과와 재진단 결과를 결합하여 최종 출력
     autoshare_final_result = {
-        "카테고리": "보안 설정",
-        "항목 설명": "'하드디스크 기본 공유 제거 여부 확인'",
+        "카테고리": "서비스 관리",
+        "항목 설명": "하드디스크 기본 공유 제거",
         "중요도": "상",
-        "진단 결과": "취약",  # 진단 결과는 취약으로 고정
-        "조치 결과": remediation_result["status"],  # 조치 결과
-        "재진단 결과": diagnosis_result["status"],  # 재진단 결과
+        "진단 결과": "취약",  
+        "조치 결과": remediation_result["status"],  
+        "재진단 결과": diagnosis_result["status"], 
         "메시지": diagnosis_result["message"],
         "조치 파일명": "8.py",
-        "조치 담당자": 담당자,  # 전달받은 담당자
-        "조치 시각": remediation_date,  # 조치 일자
-        "코드": "W-08"  # 고정된 코드
+        "조치 담당자": 담당자,  
+        "조치 시각": remediation_date,  
+        "코드": "W-08" 
     }
 
     # 최종 결과 출력

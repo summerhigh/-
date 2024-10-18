@@ -1,16 +1,11 @@
 import os
 import sys
 import subprocess
+import json
+from datetime import datetime
 
 # 두 계층 상위 경로를 sys.path에 추가
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
-
-# 결과 생성 함수
-def generate_result(file_name, status, item):
-    code = f"W-{file_name.zfill(2)}"
-    importance = "상"
-    return f"{code} {importance} {status} {item}"
 
 
 # 불필요한 IIS 기본 파일 제거 여부 확인 함수
@@ -25,7 +20,7 @@ def check_iis_default_files():
                                       '(Get-WebVirtualDirectory -Site "Default Web Site" -Name "IISHelp").PhysicalPath'], 
                                      capture_output=True, text=True)
 
-        # IISSamples 및 IISHelp 디렉토리가 존재하는지 확인
+        # IISSamples 또는 IISHelp 디렉토리가 존재하는지 확인
         samples_status = result_samples.stdout.strip()
         help_status = result_help.stdout.strip()
 
@@ -44,15 +39,24 @@ def check_iis_default_files():
             return "점검불가"
 
 
-if __name__ == "__main__": 
-    # 파일명에서 확장자 제거하고 기본 파일명 추출
-    file_name = os.path.splitext(os.path.basename(__file__))[0]
+if __name__ == "__main__":    
+    # 진단 담당자 입력 받기 (런처에서 전달받음)
+    담당자 = sys.argv[1] if len(sys.argv) > 1 else "Unknown"
     
-    item = "IIS 불필요한 파일 제거"
-
     # 결과 생성
     status = check_iis_default_files()
-    result = generate_result(file_name, status, item)
 
-    # 결과 출력
-    print(result)
+    # 진단 결과 JSON 형식으로 생성
+    result = {
+        "카테고리": "서비스 관리",
+        "항목 설명": "IIS 불필요한 파일 제거",
+        "중요도": "상",
+        "진단 결과": status,
+        "진단 파일명": "14.py",
+        "진단 담당자": 담당자,
+        "진단 시각": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "코드": "W-14"  
+    }
+
+    # 진단 결과 JSON 형식으로 출력
+    print(json.dumps(result, ensure_ascii=False, indent=4))

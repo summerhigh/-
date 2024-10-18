@@ -1,16 +1,11 @@
 import os
 import sys
 import subprocess
+import json
+from datetime import datetime
 
 # 두 계층 상위 경로를 sys.path에 추가
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
-
-# 결과 생성 함수
-def generate_result(file_name, status, item):
-    code = f"W-{file_name.zfill(2)}"
-    importance = "상"
-    return f"{code} {importance} {status} {item}"
 
 
 # IIS 디렉토리 리스팅 설정 여부 확인 함수
@@ -38,14 +33,23 @@ def check_directory_listing():
 
 
 if __name__ == "__main__":
-    # 파일명에서 확장자 제거하고 기본 파일명 추출
-    file_name = os.path.splitext(os.path.basename(__file__))[0]
-    
-    item = "디렉토리 리스팅 제거"
-    
+    # 진단 담당자 입력 받기 (런처에서 전달받음)
+    담당자 = sys.argv[1] if len(sys.argv) > 1 else "Unknown"
+
     # 결과 생성
     status = check_directory_listing()
-    result = generate_result(file_name, status, item)
-    
-    # 결과 출력
-    print(result)
+
+    # 진단 결과 JSON 형식으로 생성
+    result = {
+        "카테고리": "서비스 관리",
+        "항목 설명": "디렉토리 리스팅 제거",
+        "중요도": "상",
+        "진단 결과": status,
+        "진단 파일명": "11.py",
+        "진단 담당자": 담당자,
+        "진단 시각": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "코드": "W-11"
+    }
+
+    # 진단 결과 JSON 형식으로 출력
+    print(json.dumps(result, ensure_ascii=False, indent=4))

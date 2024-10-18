@@ -65,19 +65,19 @@ def main():
     # 재진단 수행
     diagnosis_result = check_administrators_group()
 
-    # 조치 결과와 재진단 결과를 결합하여 최종 출력 (런처에 맞는 형식)
+    # 조치 결과와 재진단 결과를 결합하여 최종 출력
     admin_result = {
-        "카테고리": "계정관리",
-        "항목 설명": "'Administrators 그룹 불필요한 계정 존재 여부 확인'",
+        "카테고리": "계정 관리",
+        "항목 설명": "관리자 그룹에 최소한의 사용자 포함",
         "중요도": "상",
-        "진단 결과": "취약",  # 진단 결과는 취약으로 고정
-        "조치 결과": remediation_result["status"],  # 조치 결과
-        "재진단 결과": diagnosis_result["status"],  # 재진단 결과
+        "진단 결과": "취약", 
+        "조치 결과": remediation_result["status"], 
+        "재진단 결과": diagnosis_result["status"], 
         "메시지": diagnosis_result["message"],
         "조치 파일명": "6.py",
-        "조치 담당자": 담당자,  # 전달받은 담당자
-        "조치 시각": remediation_date,  # 조치 일자
-        "코드": "W-06"  # 고정된 코드
+        "조치 담당자": 담당자, 
+        "조치 시각": remediation_date, 
+        "코드": "W-06"  
     }
 
     # 최종 결과 출력

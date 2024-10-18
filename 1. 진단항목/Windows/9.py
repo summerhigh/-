@@ -1,16 +1,11 @@
 import os
 import sys
 import subprocess
+import json
+from datetime import datetime
 
 # 두 계층 상위 경로를 sys.path에 추가
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
-
-# 결과 생성 함수
-def generate_result(file_name, status, item):
-    code = f"W-{file_name.zfill(2)}"
-    importance = "상"
-    return f"{code} {importance} {status} {item}"
 
 
 # 불필요한 서비스 목록
@@ -62,7 +57,7 @@ def check_unnecessary_services():
 
         # 불필요한 서비스가 실행 중인 경우 취약, 실행 중인 서비스가 없으면 양호
         if running_services:
-            return "취약", None
+            return "취약", running_services
         else:
             return "양호", None
 
@@ -70,14 +65,23 @@ def check_unnecessary_services():
         return "점검불가", None
 
 if __name__ == "__main__":
-    # 파일명에서 확장자 제거하고 기본 파일명 추출
-    file_name = os.path.splitext(os.path.basename(__file__))[0]
-    
-    item = "불필요한 서비스 제거"
+    # 진단 담당자 입력 받기 (런처에서 전달받음)
+    담당자 = sys.argv[1] if len(sys.argv) > 1 else "Unknown"
 
-    # 결과 생성
-    status, _ = check_unnecessary_services()
-    result = generate_result(file_name, status, item)
-    
-    # 결과 출력
-    print(result)
+    status, running_services = check_unnecessary_services()
+
+    # 진단 결과 JSON 형식으로 생성
+    result = {
+        "카테고리": "서비스 관리",
+        "항목 설명": "불필요한 서비스 제거",
+        "중요도": "상",
+        "진단 결과": status,
+        "실행 중인 불필요한 서비스": running_services if running_services else "없음",
+        "진단 파일명": "9.py",
+        "진단 담당자": 담당자,
+        "진단 시각": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "코드": "W-09"  
+    }
+
+    # 진단 결과 JSON 형식으로 출력
+    print(json.dumps(result, ensure_ascii=False, indent=4))

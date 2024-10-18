@@ -1,0 +1,1 @@
+2024-10-17 23:56:22.613554 - info.json 생성 완료: C:\Users\kisia\Desktop\주요정보통신기반시설진단\3. 진단결과\Windows\20241017_check2\info.json

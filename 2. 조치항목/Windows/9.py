@@ -98,19 +98,19 @@ def main():
     # 재진단 수행
     diagnosis_result = check_unnecessary_services()
 
-    # 조치 결과와 재진단 결과를 결합하여 최종 출력 (런처에 맞는 형식)
+    # 조치 결과와 재진단 결과를 결합하여 최종 출력
     service_final_result = {
-        "카테고리": "시스템 서비스",
-        "항목 설명": "'불필요한 서비스 실행 여부 확인'",
+        "카테고리": "서비스 관리",
+        "항목 설명": "불필요한 서비스 제거",
         "중요도": "상",
-        "진단 결과": "취약",  # 진단 결과는 취약으로 고정
-        "조치 결과": remediation_result["status"],  # 조치 결과
-        "재진단 결과": diagnosis_result["status"],  # 재진단 결과
+        "진단 결과": "취약",  
+        "조치 결과": remediation_result["status"],  
+        "재진단 결과": diagnosis_result["status"], 
         "메시지": diagnosis_result["message"],
         "조치 파일명": "9.py",
-        "조치 담당자": 담당자,  # 전달받은 담당자
-        "조치 시각": remediation_date,  # 조치 일자
-        "코드": "W-09"  # 고정된 코드
+        "조치 담당자": 담당자,  
+        "조치 시각": remediation_date, 
+        "코드": "W-09"  
     }
 
     # 최종 결과 출력

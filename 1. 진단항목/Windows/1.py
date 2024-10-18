@@ -27,22 +27,19 @@ if __name__ == "__main__":
     # 진단 담당자 입력 받기 (런처에서 전달받음)
     담당자 = sys.argv[1] if len(sys.argv) > 1 else "Unknown"
     
-    # 파일명에서 확장자 제거하고 기본 파일명 추출
-    file_name = os.path.splitext(os.path.basename(__file__))[0]
-    
     # check_admin_account 결과를 기반으로 진단 상태 결정
     status = check_admin_account()
     
     # 진단 결과 JSON 형식으로 생성
     result = {
-        "카테고리": "계정관리",
-        "항목 설명": "'Administrator 계정 이름 변경 또는 보안성 강화'",
+        "카테고리": "계정 관리",
+        "항목 설명": "Administrator 계정 이름 변경 또는 보안성 강화",
         "중요도": "상",
         "진단 결과": status,
-        "진단 파일명": f"{file_name}.py",
+        "진단 파일명": "1.py",
         "진단 담당자": 담당자,
         "진단 시각": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "코드": "W-01"  # 코드 고정
+        "코드": "W-01"  
     }
     
     # 진단 결과 JSON 형식으로 출력
