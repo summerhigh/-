@@ -4,23 +4,27 @@ import json
 from datetime import datetime
 import subprocess
 
-# 두 계층 상위 경로를 sys.path에 추가
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
 # World Writable 파일 점검 함수 (서버별로 다르게 진단)
 def check_world_writable_files():
     try:
         # World writable 파일을 찾기 위한 명령어 실행
-        result = subprocess.run(['find', '/', '-xdev', '-type', 'f', '-perm', '-0002', '-ls'], 
-                                capture_output=True, text=True, stderr=subprocess.DEVNULL)
+        result = subprocess.run(
+            ['find', '/', '-xdev', '-type', 'f', '-perm', '-0002', '-ls'], 
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
+
+        # 예외: 명령어 실행 후 반환 코드가 0이 아닐 경우 오류 처리
+        if result.returncode != 0:
+            return "점검불가"
 
         # 결과가 있으면 취약한 상태 (world writable 파일이 존재)
-        if result.stdout:
-            return "취약"  # World writable 파일이 존재하는 경우
+        if result.stdout.strip():  # 결과가 비어있지 않으면 취약
+            return "취약"
 
         return "양호"  # World writable 파일이 존재하지 않는 경우
+
     except Exception as e:
-        return "점검불가"  # 오류 발생 시 취약 처리
+        return "점검불가"  # 오류 발생 시 점검 불가로 처리
 
 if __name__ == "__main__":
     # 진단 담당자 입력 받기 (런처에서 전달받음)

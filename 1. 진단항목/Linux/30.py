@@ -10,11 +10,22 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 # 최신 Sendmail 버전 정보 (예: 8.15.2)
 LATEST_SENDMAIL_VERSION = "8.15.2"
 
+# 버전 문자열을 정수로 변환하여 비교
+def compare_versions(current, latest):
+    current_parts = [int(part) for part in current.split('.')]
+    latest_parts = [int(part) for part in latest.split('.')]
+    return current_parts >= latest_parts
+
 # Sendmail 버전 점검 함수
 def check_sendmail_version():
     try:
         # Sendmail 버전 확인 명령어 실행
-        sendmail_version_check = subprocess.run(['sendmail', '-d0.1'], capture_output=True, text=True, stderr=subprocess.STDOUT)
+        sendmail_version_check = subprocess.run(
+            ['sendmail', '-d0.1'], 
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.PIPE, 
+            text=True
+        )
         
         if sendmail_version_check.returncode == 0:
             # 버전 정보 출력에서 Sendmail 버전 추출
@@ -24,8 +35,8 @@ def check_sendmail_version():
             if version_line:
                 current_version = version_line[0].split()[2]  # Version 정보 추출
                 
-                # 최신 버전과 비교
-                if current_version >= LATEST_SENDMAIL_VERSION:
+                # 버전 비교
+                if compare_versions(current_version, LATEST_SENDMAIL_VERSION):
                     return "양호"  # 최신 버전 사용 중인 경우
                 else:
                     return "취약"  # 취약한 버전 사용 중인 경우
@@ -34,6 +45,7 @@ def check_sendmail_version():
     except FileNotFoundError:
         return "양호"  # Sendmail이 설치되어 있지 않음 (서비스 미사용)
     except Exception as e:
+        print(f"오류 발생: {e}")
         return "점검불가"  # 오류 발생 시 점검불가 처리
 
 if __name__ == "__main__":
