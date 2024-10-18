@@ -16,11 +16,6 @@ def check_invalid_device_files():
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
         )
 
-        # 명령 실행 결과 디버깅 출력
-        print(f"Return Code: {result.returncode}")
-        print(f"Stdout Output: {result.stdout}")
-        print(f"Stderr Output: {result.stderr}")
-
         # 명령어 실행 후 반환 코드가 0이 아닐 경우 오류 처리
         if result.returncode != 0:
             return "점검불가"
@@ -32,7 +27,6 @@ def check_invalid_device_files():
         return "양호"  # 존재하지 않는 device 파일이 없는 경우
 
     except Exception as e:
-        print(f"오류 발생: {e}")  # 오류 내용 출력
         return "점검불가"  # 오류 발생 시 점검 불가로 처리
 
 if __name__ == "__main__":

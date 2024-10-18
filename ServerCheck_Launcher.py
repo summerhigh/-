@@ -52,29 +52,46 @@ def run_diagnosis_script(script_path, json_output_path, 담당자, log_file_path
 
 # 진단 범위 선택
 def get_diagnosis_range():
-    print("진단 방식을 선택하세요. 1. 전체 2. 부분")
-    선택 = input("입력: ").strip()
+    current_os = platform.system()  # 운영체제 확인
+
+    if current_os == "Windows":
+        max_range = 45
+        print(f"현재 운영체제는 Windows입니다. 1~{max_range} 항목에서 진단할 범위를 선택하세요.")
+    elif current_os == "Linux":
+        max_range = 43
+        print(f"현재 운영체제는 Linux입니다. 1~{max_range} 항목에서 진단할 범위를 선택하세요.")
+    else:
+        sys.exit("지원되지 않는 운영체제입니다. 프로그램을 종료합니다.")
+
+    선택 = input("진단 방식을 선택하세요. 1. 전체 2. 부분: ").strip()
 
     if 선택 == '1':
         return "전체", []
     elif 선택 == '2':
-        범위 = input("1~37 항목에서 진단할 범위를 설정해주세요. (예시: 1,2,5-10): ").strip()
-        범위_리스트 = parse_range(범위)
+        범위 = input(f"1~{max_range} 항목에서 진단할 범위를 설정해주세요. (예시: 1,2,5-10): ").strip()
+        범위_리스트 = parse_range(범위, max_range)
         return "부분", 범위_리스트
     else:
         print("잘못된 입력입니다. 다시 시도하세요.")
         return get_diagnosis_range()
 
-# 범위 파싱 (예: '1,2,5-10'을 리스트로 변환)
-def parse_range(range_str):
+# 범위 파싱 (예: '1,2,5-10'을 리스트로 변환, max_range를 넘지 않도록 제한)
+def parse_range(range_str, max_range):
     result = []
     ranges = range_str.split(',')
     for r in ranges:
         if '-' in r:
             start, end = map(int, r.split('-'))
+            if start > max_range or end > max_range:
+                print(f"범위 {start}-{end}는 허용된 범위를 초과합니다. (최대 {max_range})")
+                continue
             result.extend(range(start, end + 1))
         else:
-            result.append(int(r))
+            num = int(r)
+            if num > max_range:
+                print(f"항목 {num}은 허용된 범위를 초과합니다. (최대 {max_range})")
+                continue
+            result.append(num)
     return result
 
 # 진단항목파일 존재여부 체크

@@ -23,9 +23,6 @@ def check_ip_port_restrictions():
 
         # iptables 규칙 확인 (리눅스 커널 방화벽)
         iptables_check = subprocess.run(['iptables', '-L'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        print(f"iptables Return Code: {iptables_check.returncode}")
-        print(f"iptables Output: {iptables_check.stdout}")
-        print(f"iptables Error: {iptables_check.stderr}")
         iptables_configured = iptables_check.returncode == 0 and 'ACCEPT' in iptables_check.stdout
 
         # IPFilter, 다른 방화벽 설정 확인 (솔라리스, AIX 등, 리눅스가 아닌 경우에만 확인)
@@ -33,12 +30,10 @@ def check_ip_port_restrictions():
         if not os.path.exists('/etc/debian_version'):  # Linux(Debian 계열)가 아닐 경우만 ipfstat 점검
             try:
                 ipfilter_check = subprocess.run(['ipfstat', '-io'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-                print(f"ipfilter Return Code: {ipfilter_check.returncode}")
-                print(f"ipfilter Output: {ipfilter_check.stdout}")
-                print(f"ipfilter Error: {ipfilter_check.stderr}")
+
                 ipfilter_configured = ipfilter_check.returncode == 0 and ipfilter_check.stdout.strip() != ''
             except FileNotFoundError:
-                print("ipfstat 명령어를 찾을 수 없습니다. 이 시스템에는 ipfstat이 필요하지 않음.")
+                return "점검불가"
 
         # 각 조건을 만족하는지 여부 확인
         if tcp_wrapper_configured or iptables_configured or ipfilter_configured:
@@ -46,7 +41,6 @@ def check_ip_port_restrictions():
 
         return "취약"  # 접속 IP 및 포트 제한 설정이 없는 경우
     except Exception as e:
-        print(f"오류 발생: {e}")
         return "점검불가"  # 오류 발생 시 점검 불가로 처리
 
 if __name__ == "__main__":
