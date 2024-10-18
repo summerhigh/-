@@ -28,10 +28,10 @@ def check_syslog_conf_permissions():
                 return "양호"  # 소유자가 root, bin 또는 sys이고 권한이 640 이하인 경우
 
             except Exception as e:
-                return "취약"  # 오류 발생 시 취약 처리
+                return "점검불가"  # 오류 발생 시 취약 처리
 
     # 모든 파일이 존재하지 않는 경우 취약 처리
-    return "취약"
+    return "점검불가"
 
 if __name__ == "__main__":
     # 진단 담당자 입력 받기 (런처에서 전달받음)
