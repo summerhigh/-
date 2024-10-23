@@ -71,17 +71,60 @@ def get_unique_filename(directory, base_name):
             return file_path
         index += 1
 
-# 평탄화된 형태로 변환하는 함수 (공백 및 줄바꿈 제거)
-def flatten_json(file_path):
-    # 병합된 JSON 파일을 읽어옴
+def flatten_json(file_path, output_path):
+    # 파일을 읽어서 JSON 데이터로 변환
     with open(file_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)    
-    # 공백과 줄바꿈 문자 제거, ensure_ascii=False를 사용하여 한글을 그대로 출력
-    json_string = json.dumps(data, separators=(',', ':'), ensure_ascii=False)
-    return json_string
+        data = json.load(f)
+
+    flattened = []
+
+    # 데이터가 리스트인지 확인
+    if isinstance(data, list):
+        # 리스트라면 각 항목에 대해 처리
+        for item in data:
+            # 시스템 목록에 접근 (각각의 시스템)
+            if "시스템 목록" in item:
+                for system in item["시스템 목록"]:
+                    system_name = system["시스템 이름"]
+                    ip_address = system["IP 주소"]
+                    os = system["운영 체제"]
+                    os_version = system["운영 체제 버전"]
+                    system_uuid = system["시스템 UUID"]
+                    location = system["지역"]
+
+                    # 진단 항목을 개별 객체로 변환하여 배열에 추가
+                    for key, diagnostic in system["진단 항목"].items():
+                        flattened.append({
+                            "시설명": item["시설명"],
+                            "진단_시작일자": item["진단 시작일자"],
+                            "진단_종료일자": item["진단 종료일자"],
+                            "시스템_이름": system_name,
+                            "IP_주소": ip_address,
+                            "운영_체제": os,
+                            "운영_체제_버전": os_version,
+                            "시스템_UUID": system_uuid,
+                            "지역": location,
+                            "진단항목": key,
+                            "카테고리": diagnostic["카테고리"],
+                            "항목_설명": diagnostic["항목 설명"],
+                            "중요도": diagnostic["중요도"],
+                            "진단_결과": diagnostic["진단 결과"],
+                            "진단_파일명": diagnostic["진단 파일명"],
+                            "진단_담당자": diagnostic["진단 담당자"],
+                            "진단_시각": diagnostic["진단 시각"]
+                        })
+    else:
+        print("올바른 리스트 형태의 JSON 데이터를 입력하세요.")
+
+    # 변환된 데이터를 output_path에 저장
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(flattened, f, ensure_ascii=False, indent=4)
+
+    print(f"Flattened JSON 파일이 {output_path}에 저장되었습니다.")
 
 # 프로그램 실행
 if __name__ == "__main__":
+
     # 경로와 파일 키워드, 출력 파일명 베이스 선택
     input_directory, file_keyword, output_base_name = select_directory()
     
@@ -105,8 +148,4 @@ if __name__ == "__main__":
     print(f"통합 결과가 {output_file_path_integrated}에 저장되었습니다.")
 
     # 병합된 파일을 읽어들여 평탄화된 결과 생성 및 저장
-    flattened_data = flatten_json(output_file_path_integrated)
-    with open(output_file_path_flattened, 'w', encoding='utf-8') as output_file:
-        output_file.write(flattened_data)
-
-    print(f"평탄화된 결과가 {output_file_path_flattened}에 저장되었습니다.")
+    flattened_data = flatten_json(output_file_path_integrated, output_file_path_flattened)

@@ -3,6 +3,7 @@ import subprocess
 import json
 import socket
 import platform
+import uuid
 import sys 
 from datetime import datetime
 from make_json import make_json
@@ -159,6 +160,7 @@ def generate_info_json(result_dir, log_file_path):
                 "IP 주소": socket.gethostbyname(socket.gethostname()),
                 "운영 체제": platform.system(), 
                 "운영 체제 버전": platform.version(),
+                "시스템 UUID": str(uuid.uuid1()),
                 "지역": "서울"      # To-do : 지역 입력받기
             }
         ]
@@ -203,7 +205,6 @@ def main():
         elif current_os == "Linux":
             응답 = input("현재 운영체제는 Linux입니다. 진단하시겠습니까? (y/n): ").strip().lower()
         else:
-            print(f"현재 운영체제는 {current_os}입니다.")
             sys.exit("지원되지 않는 운영체제입니다. 프로그램을 종료합니다.") 
 
         # 올바른 입력인지 확인
@@ -222,8 +223,12 @@ def main():
     # 진단 방식 및 범위 선택
     진단_방식, 진단_범위 = get_diagnosis_range()
 
+    # 운영체제에 따른 진단 범위 설정
     if 진단_방식 == "전체":
-        진단_범위 = list(range(1, 38))
+        if current_os == "Windows":
+            진단_범위 = list(range(1, 46))  # Windows에서는 1~45번 항목까지 진단
+        elif current_os == "Linux":
+            진단_범위 = list(range(1, 44))  # Linux에서는 1~43번 항목까지 진단
 
     # 진단할 파일 확인
     valid_files = check_files_exist(진단_범위)

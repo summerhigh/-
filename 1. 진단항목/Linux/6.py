@@ -8,18 +8,19 @@ import subprocess
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # 소유자가 없는 파일 및 디렉터리 확인 함수 (서버별로 다르게 진단)
+# 일부 디렉토리로 임시 한정함 : /home, /var, /etc
 def check_orphaned_files():
     try:
         # 첫 번째 시도: 리눅스 및 대부분의 유닉스에서 소유자가 없는 파일 및 디렉터리 확인
-        result = subprocess.run(['find', '/', '-nouser', '-o', '-nogroup'], capture_output=True, text=True)
+        result = subprocess.run(['find', '/home', '/var', '/etc', '-nouser', '-o', '-nogroup'], capture_output=True, text=True)
 
         # 두 번째 시도: AIX에서 소유자가 없는 파일을 찾기 위한 대체 명령어
         if result.returncode != 0 or not result.stdout:
-            result = subprocess.run(['find', '/', '-fstype', 'jfs2', '-nouser', '-o', '-nogroup'], capture_output=True, text=True)
+            result = subprocess.run(['find', '/home', '/var', '/etc', '-fstype', 'jfs2', '-nouser', '-o', '-nogroup'], capture_output=True, text=True)
 
         # 세 번째 시도: HP-UX에서 소유자가 없는 파일을 찾기 위한 대체 명령어
         if result.returncode != 0 or not result.stdout:
-            result = subprocess.run(['find', '/', '-fstype', 'hfs', '-nouser', '-o', '-nogroup'], capture_output=True, text=True)
+            result = subprocess.run(['find', '/home', '/var', '/etc', '-fstype', 'hfs', '-nouser', '-o', '-nogroup'], capture_output=True, text=True)
 
         # 명령어 실행 결과 확인
         if result.returncode == 0 and result.stdout:

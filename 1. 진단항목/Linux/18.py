@@ -7,6 +7,7 @@ import subprocess
 # 두 계층 상위 경로를 sys.path에 추가
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+
 # 접속 IP 및 포트 제한 설정 여부를 점검하는 함수
 def check_ip_port_restrictions():
     try:
@@ -21,16 +22,19 @@ def check_ip_port_restrictions():
                     if content and '+' not in content:  # 설정이 있고, 모든 호스트 허용(+) 설정이 아닌 경우
                         tcp_wrapper_configured = True
 
+        # iptables 명령이 있는지 확인
+        if subprocess.run(['which', 'iptables'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).returncode != 0:
+            return "점검불가"  # iptables 명령어가 없는 경우
+
         # iptables 규칙 확인 (리눅스 커널 방화벽)
         iptables_check = subprocess.run(['iptables', '-L'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         iptables_configured = iptables_check.returncode == 0 and 'ACCEPT' in iptables_check.stdout
 
         # IPFilter, 다른 방화벽 설정 확인 (솔라리스, AIX 등, 리눅스가 아닌 경우에만 확인)
         ipfilter_configured = False
-        if not os.path.exists('/etc/debian_version'):  # Linux(Debian 계열)가 아닐 경우만 ipfstat 점검
+        if not os.path.exists('/etc/debian_version'):  # Linux(Debian 계열이 아닌 경우만 ipfstat 점검
             try:
                 ipfilter_check = subprocess.run(['ipfstat', '-io'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
                 ipfilter_configured = ipfilter_check.returncode == 0 and ipfilter_check.stdout.strip() != ''
             except FileNotFoundError:
                 return "점검불가"

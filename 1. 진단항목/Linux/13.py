@@ -12,7 +12,7 @@ def check_suid_sgid_files():
     try:
         # SUID, SGID 설정된 파일을 찾기 위한 명령어 실행 (stderr 무시)
         result = subprocess.run(
-            ['find', '/', '-perm', '-4000', '-o', '-perm', '-2000', '-type', 'f', '-ls'], 
+            ['find', '/', '-xdev', '-user', 'root', '-type', 'f', '-perm', '-04000', '-o', '-perm', '-02000', '-print'], 
             stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True
         )
 
