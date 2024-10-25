@@ -98,7 +98,7 @@ def flatten_json(file_path, output_path, is_action):
                     ip_address = system["IP 주소"]
                     os = system["운영 체제"]
                     os_version = system["운영 체제 버전"]
-                    system_uuid = system.get("시스템 UUID", "N/A")  # 조치 항목에는 UUID가 없을 수 있으므로 기본값 설정
+                    hwid = system.get("HWID", "N/A")  
                     location = system["지역"]
 
                     # 진단 항목 또는 조치 항목을 개별 객체로 변환하여 배열에 추가
@@ -111,7 +111,7 @@ def flatten_json(file_path, output_path, is_action):
                             "IP 주소": ip_address,
                             "운영 체제": os,
                             "운영 체제 버전": os_version,
-                            "시스템 UUID": system_uuid,
+                            "HWID": hwid,  # HWID 추가
                             "지역": location,
                             "항목 코드": key,
                             "카테고리": 항목["카테고리"],
